@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Contacts by Saifullah</string>
+    <string name="title_add_contact">Add New Contact</string>
+    <string name="add_name">Name</string>
+    <string name="add_number">Number</string>
+    <string name="sex_by_born">Sex (by born) :</string>
+    <string name="woman">XX (Woman)</string>
+    <string name="man">XY (Man)</string>
+    <string name="intersex">Intersex</string>
+    <string name="save_contact">Save</string>
+    <string name="call_icon">Call icon</string>
+    <string name="contact_photo_description">Contact photo</string>
+    <string name="noContactNotice">No Contact\nAdd some?</string>
+    <string name="search_contact">Search Contact</string>
+</resources>
