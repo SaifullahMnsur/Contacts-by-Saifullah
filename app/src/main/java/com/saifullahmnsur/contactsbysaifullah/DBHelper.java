@@ -8,21 +8,15 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class DBHelper extends SQLiteOpenHelper {
-
-    private static DBHelper dbHelper;
-    public static DBHelper getInstance(Context context){
-        if( dbHelper == null ){
-            dbHelper = new DBHelper(context);
-        }
-        return dbHelper;
-    }
+    // DBHelper constructor
     public DBHelper(Context context) {
         super(context, "ContactsData.db", null, 1);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String command = "CREATE TABLE ContactDetails(" +
+        // create a table on create
+        String command = "CREATE TABLE IF NOT EXISTS ContactDetails(" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "name TEXT," +
                 "number TEXT," +
@@ -30,6 +24,7 @@ public class DBHelper extends SQLiteOpenHelper {
         try {
             db.execSQL(command);
         } catch (Exception e) {
+            // On exception found
             Log.e("DBHelper", "onCreate: Exception found", e);
         }
     }
@@ -37,19 +32,20 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
         db.execSQL("drop Table if exists ContactDetails");
     }
-    public Boolean insertContactData(String name, String number, String sex){
+    public Boolean insertContactData(Contact contact){
         try {
-            SQLiteDatabase db = this.getWritableDatabase();
-            ContentValues contentValues = new ContentValues();
-            contentValues.put("name", name);
-            contentValues.put("number", number);
-            contentValues.put("sex", sex);
+            SQLiteDatabase db = this.getWritableDatabase(); // get the writable database
 
-            long result = db.insert("ContactDetails", null, contentValues);
+            ContentValues contentValues = new ContentValues(); // declare and initialize a contact value to store before inserting into database
+            contentValues.put("name", contact.getName()); // add name
+            contentValues.put("number", contact.getNumber()); // add number
+            contentValues.put("sex", contact.getSex()); // add sex
+
+            long result = db.insert("ContactDetails", null, contentValues); // insert the data into database
 
             if (result != -1) {
                 // Insert successful
-                Log.i("DBHelper", "insertContactData: Successful! Inserted row with name: " + name + ", number: " + number + ", sex: " + sex);
+                Log.i("DBHelper", "insertContactData: Successful! Inserted row with name: " + contact.getName() + ", number: " + contact.getNumber() + ", sex: " + contact.getSex());
                 return true;
             } else {
                 // Insert failed
@@ -57,12 +53,13 @@ public class DBHelper extends SQLiteOpenHelper {
                 return false;
             }
         } catch (Exception e){
+            // Exception found
             Log.e("DBHelper", "insertContactData: Failed! ", e);
             return false;
         }
     }
     public Cursor getData(){
-        SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("Select * from ContactDetails", null);
+        SQLiteDatabase db = this.getReadableDatabase(); // get readable database
+        return db.rawQuery("SELECT * FROM ContactDetails", null); // get and return all the records from database
     }
 }

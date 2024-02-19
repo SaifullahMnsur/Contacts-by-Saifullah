@@ -25,73 +25,68 @@ import java.util.ArrayList;
 
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
-    private final Context context;
-//    private final ArrayList<String> nameId, numberId, sexId;
-    private final ArrayList<Contact> contacts;
+    private final Context context; // declare context
+    private final ArrayList<Contact> contacts; // declare Contacts Array List
 
-//    public MyAdapter(Context context, ArrayList<String> nameId, ArrayList<String> numberId, ArrayList<String> sexId) {
-//        this.context = context;
-//        this.nameId = nameId;
-//        this.numberId = numberId;
-//        this.sexId = sexId;
-//    }
     public MyAdapter(Context context, ArrayList<Contact>contacts){
-        this.context = context;
-        this.contacts = contacts;
+        this.context = context; // initialize context
+        this.contacts = contacts; // initialize contacts array list
     }
 
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // create a view using contact card layout to show in recyclerview
         View view = LayoutInflater.from(context).inflate(R.layout.contactcard, parent,false);
         return new MyViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, @SuppressLint("RecyclerView") int position) {
-//        holder.nameId.setText(String.valueOf(nameId.get(position)));
-//        holder.numberId.setText(String.valueOf(numberId.get(position)));
+        // set the values of ith position
         Contact contact = contacts.get(position);
 
-        holder.nameId.setText(contact.getName());
-        holder.numberId.setText(contact.getNumber());
+        holder.tvName.setText(contact.getName()); // set name
+        holder.tvNumber.setText(contact.getNumber()); // set number
 
-        holder.favCall.setOnClickListener(view -> initiateCall(contact.getNumber()));
+        // initialize call on clicking call button
+        holder.fabCall.setOnClickListener(view -> initiateCall(contact.getNumber()));
     }
 
     @Override
     public int getItemCount() {
-        return contacts.size();
+        return contacts.size(); // number of individual contact
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView nameId, numberId, sexId;
-        FloatingActionButton favCall; // Add this line
+        TextView tvName, tvNumber; // declare contact name and number view
+        FloatingActionButton fabCall; // declare call button view
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
-            nameId = itemView.findViewById(R.id.tvContactName);
-            numberId = itemView.findViewById(R.id.tvContactNumber);
-            favCall = itemView.findViewById(R.id.favCall); // Add this line
+            tvName = itemView.findViewById(R.id.tvContactName); // initialize contact name view
+            tvNumber = itemView.findViewById(R.id.tvContactNumber); // initialize contact number view
+            fabCall = itemView.findViewById(R.id.fabCall); // initialize call button view
         }
     }
 
     private void initiateCall(String phoneNumber){
+        // Check if the device granted permission for phone call
         if(ContextCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED){
-            Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+
+            Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE); // declare and initialize vibrator
             // Check if the device supports vibration
             if (vibrator != null && vibrator.hasVibrator()) {
                 // For API level 26 and above
                 VibrationEffect vibe = VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE);
-                vibrator.vibrate(vibe);
+                vibrator.vibrate(vibe); // vibrate for 50ms
             }
-            String phoneNumberUri = "tel: " + phoneNumber;
-            Intent dialIntent = new Intent(Intent.ACTION_CALL, Uri.parse(phoneNumberUri));
-            context.startActivity(dialIntent);
+            String phoneNumberUri = "tel: " + phoneNumber; // set string of Telephone URI
+            Intent dialIntent = new Intent(Intent.ACTION_CALL, Uri.parse(phoneNumberUri)); // declare and initialize a dial intent to call the number
+            context.startActivity(dialIntent); // start dial intent and the call
         } else {
             // Permission is not granted, request it
             ActivityCompat.requestPermissions((Activity) context,
                     new String[]{Manifest.permission.CALL_PHONE}, 1);
-            // Handle the result in onRequestPermissionsResult callback
         }
     }
 

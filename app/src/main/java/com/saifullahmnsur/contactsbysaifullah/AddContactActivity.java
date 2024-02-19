@@ -13,57 +13,57 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.Objects;
-
 public class AddContactActivity extends AppCompatActivity {
-
-    String name;
-    String number;
-    String sex = "";
-    DBHelper db;
+    private Contact contact; // declare contact
+    private DBHelper db; // declare database helper declaration
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_contact);
 
-        db = DBHelper.getInstance(this);
+        db = new DBHelper(this); // get instance of database helper
+        contact = new Contact(); // initialize contact
 
-        EditText etName = findViewById(R.id.etName);
-        EditText etNumber = findViewById(R.id.etNumber);
-        RadioGroup radioGroup = findViewById(R.id.radioGroup);
-        radioGroup.setHapticFeedbackEnabled(true);
-        Button btSave = findViewById(R.id.btSave);
+        EditText etName = findViewById(R.id.etName); // declare and initialize edit text view for name
+        EditText etNumber = findViewById(R.id.etNumber); // declare and initialize edit text view for number
+        RadioGroup radioGroup = findViewById(R.id.radioGroup);  // declare and initialize radio group view for sex
+        radioGroup.setHapticFeedbackEnabled(true); // enable haptic feedback
+        Button btSave = findViewById(R.id.btSave); // declare and initialize button view to save the contact
 
-
+        // when any of the radio button is clicked
         radioGroup.setOnCheckedChangeListener((radioGroup1, buttonId) -> {
             RadioButton radioButton = findViewById(buttonId);
-            sex = radioButton.getText().toString();
+            contact.setSex(radioButton.getText().toString());
         });
 
+        // when save button is clicked
         btSave.setOnClickListener(view -> {
-            name = etName.getText().toString();
-            number = etNumber.getText().toString();
-            if( !name.isEmpty() && !number.isEmpty() && !sex.isEmpty()) {
-                Boolean checkInsertData = db.insertContactData(name, number, sex);
+            contact.setName(etName.getText().toString()); // get name
+            contact.setNumber(etNumber.getText().toString()); // get number
+            // when all necessary inputs are given
+            if( contact.isSavable() ) {
+                Boolean checkInsertData = db.insertContactData(contact); // add the data into database
                 if (checkInsertData) {
-                    Toast.makeText(AddContactActivity.this, name + "\n" + number + "\n" + sex + "\nSaved", Toast.LENGTH_SHORT).show();
+                    // if data is stored, show toast message and return to main activity
+                    Toast.makeText(AddContactActivity.this, contact.getName() + "\n" + contact.getNumber() + "\n" + contact.getSex() + "\nSaved", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(this, MainActivity.class));
                     finish();
                 } else {
+                    // if data is not store, show toast message
                     Toast.makeText(AddContactActivity.this, "Could not save data", Toast.LENGTH_SHORT).show();
                 }
             }
-            if( name.isEmpty() ){
-                etName.setError("Name required");
+            if( contact.getName().isEmpty() ){
+                etName.setError("Name required"); // if name is not given show error
             }
-            if( number.isEmpty() ){
-                etNumber.setError("Number required");
+            if( contact.getNumber().isEmpty() ){
+                etNumber.setError("Number required"); // if number is not given show error
             }
-            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE); // initialize vibrator
             // Check if the device supports vibration
             if (vibrator != null && vibrator.hasVibrator()) {
                 // For API level 26 and above
-                VibrationEffect vibe = VibrationEffect.createOneShot(150, VibrationEffect.DEFAULT_AMPLITUDE);
+                VibrationEffect vibe = VibrationEffect.createOneShot(150, VibrationEffect.DEFAULT_AMPLITUDE); // vibrate for 150ms
                 vibrator.vibrate(vibe);
             }
         });
