@@ -4,6 +4,19 @@ public class Contact {
     private int ID;
     private String name, number, sex;
 
+    public Contact(int ID, String name, String number, String sex) {
+        this.ID = ID;
+        this.name = name;
+        this.number = number;
+        this.sex = sex;
+    }
+
+    public Contact(String name, String number, String sex) {
+        this.name = name;
+        this.number = number;
+        this.sex = sex;
+    }
+
     public Contact(){
 
     }
